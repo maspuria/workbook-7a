@@ -1,15 +1,59 @@
 -- JOINS 
 Use northwind;
 
--- workbook 7a exercise 2 page 88
+-- Workbook 7a exercise 2 page 88
 -- 1. List the product id, product name, unit price and category name of all 
 -- products.  Order by category name and within that, by product name.
-SELECT ProductID, 
-		ProductName, 
-        CategoryName,
-		UnitPrice, 
-		categories.CategoryName
+SELECT ProductID, ProductName, CategoryName, UnitPrice 
 FROM products
 INNER JOIN categories 
 		ON products.CategoryID = categories.CategoryID
 ORDER BY CategoryName, ProductName;
+
+-- 2. List the product id, product name, unit price and supplier name of all 
+-- products that cost more than $75.  Order by product name.
+SELECT ProductID, ProductName, UnitPrice, 
+ suppliers.CompanyName AS SupplierName,
+ products.SupplierID AS "Product SupplierID",
+ suppliers.SupplierID AS "Supplier SupplierID"
+FROM products
+INNER JOIN suppliers ON products.SupplierID = suppliers.SupplierID
+WHERE UnitPrice >= 75
+ORDER BY ProductName;
+
+-- 3. List the product id, product name, unit price, category name, and supplier 
+-- name of every product.  Order by product name.
+
+ 
+-- 4. What is the product name(s) and categories of the most expensive 
+-- products?  HINT:  Find the max price in a subquery and then use that in 
+-- your more complex query that joins products with categories. 
+SELECT ProductName, categories.CategoryName, UnitPrice, 
+		products.CategoryID as "Product CategoryID",
+		categories.CategoryID as "Category CategoryID"
+FROM products
+JOIN categories
+	on products.CategoryID = categories.CategoryID
+WHERE UnitPrice IN (SELECT MAX(UnitPrice)
+					FROM products);
+
+-- 5. List the order id, ship name, ship address, and shipping company name of 
+-- every order that shipped to Germany. 
+SELECT OrderID, ShipName, ShipAddress, shippers.CompanyName, ShipCountry,
+shippers.ShipperID AS "Shippers ShipID",
+orders.shipVia AS "Orders ShipID"
+FROM orders -- table1
+INNER JOIN shippers -- table2
+		ON orders.ShipVia = shippers.ShipperID
+WHERE ShipCountry = "Germany";
+
+-- 6. List the order id, order date, ship name, ship address of all orders that 
+-- ordered "Sasquatch Ale"? 
+SELECT orders.OrderID, OrderDate, ShipName, ShipAddress, 
+products.ProductID, products.ProductName
+FROM orders
+INNER JOIN `order details`
+		ON orders.OrderID = `order details`.OrderID
+INNER JOIN products
+		ON `order details`.ProductID = products.ProductID
+WHERE products.ProductName = "Sasquatch Ale";
